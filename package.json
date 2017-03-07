@@ -33,6 +33,9 @@
     ],
     "env": {
       "node": true
+    },
+    "rules": {
+      "no-new": "off"
     }
   },
   "pre-commit": "lint-staged",
@@ -45,7 +48,8 @@
   },
   "babel": {
     "plugins": [
-      "transform-flow-strip-types"
+      "transform-flow-strip-types",
+      "prettier"
     ],
     "presets": [
       [
