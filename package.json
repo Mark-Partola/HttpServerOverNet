@@ -29,8 +29,7 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "airbnb-base",
-      "prettier"
+      "airbnb-base"
     ],
     "env": {
       "node": true

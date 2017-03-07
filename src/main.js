@@ -2,28 +2,51 @@
 
 import { Server } from 'net';
 
-const server = new Server();
+import deferred from './utils/deferred';
 
-server.on('connection', (client) => {
+class TcpServer extends Server {
 
-  client.on('data', (data) => {
-    console.log(data.toString());
-    client.write('HTTP/1.1 200 OK');
-    client.end();
-  });
-});
+  constructor() {
+    super();
 
-server.on('listening', () => {
-  console.log('Listening on 127.0.0.1:8080');
-});
+    this.addListeners();
+  }
 
-server.on('close', () => {
-  console.log('Server stopped.');
-});
+  addListeners() {
+    this.on('connection', (client) => {
+      client.on('data', (data) => {
+        global.console.log(data.toString());
+        client.write('HTTP/1.1 200 OK');
+      });
+    });
 
-server.on('error', (error) => {
-  console.log('An error occurred.');
-  console.log(error);
-});
+    this.on('listening', () => {
+      global.console.log('Listening on 127.0.0.1:8080');
+    });
 
-server.listen(8080);
+    this.on('close', () => {
+      global.console.log('Server stopped.');
+    });
+
+    this.on('error', (error) => {
+      global.console.log('An error occurred.');
+      global.console.log(error);
+    });
+  }
+
+  listen(port) {
+    const promise = deferred();
+    super.listen(port, () => promise.resolve());
+    return promise.promise;
+  }
+}
+
+class HttpServer extends TcpServer {
+
+  listen(port) {
+    return super.listen(port);
+  }
+}
+
+const httpServer = new HttpServer();
+httpServer.listen(8080);
