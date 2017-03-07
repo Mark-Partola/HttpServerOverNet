@@ -48,8 +48,7 @@
   },
   "babel": {
     "plugins": [
-      "transform-flow-strip-types",
-      "prettier"
+      "transform-flow-strip-types"
     ],
     "presets": [
       [
