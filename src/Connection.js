@@ -8,13 +8,9 @@ type MainHeader = {
   version: string
 };
 
-type CommonHeader = {
-  [key: string]: string
-}
-
 type Headers = {
   start: MainHeader,
-  common: Array<CommonHeader>
+  common: Map<string, string>
 };
 
 class Request {
@@ -22,7 +18,7 @@ class Request {
   method: string;
   uri: string;
   version: string;
-  headers: Array<CommonHeader>;
+  headers: Map<string, string>;
 
   setStartHeader(startHeader: MainHeader): void {
     this.method = startHeader.method;
@@ -30,7 +26,7 @@ class Request {
     this.version = startHeader.version;
   }
 
-  setHeaders(headers: Array<CommonHeader>): void {
+  setHeaders(headers: Map<string, string>): void {
     this.headers = headers;
   }
 }
@@ -56,7 +52,7 @@ export default class Connection {
         this.request.setStartHeader(headers.start);
         this.request.setHeaders(headers.common);
 
-        global.console.log(this.request.headers);
+        global.console.log(this.request.headers.get('Content-Length'));
       }
     });
 
@@ -84,13 +80,15 @@ export default class Connection {
     const startString = headerRows.shift();
     const parsedStartString = startString.split(' ');
 
-    const headers: Array<CommonHeader> = headerRows.map((row) => {
+    const headersMap = headerRows.reduce((acc, row) => {
       const parts = row.split(': ');
+      return Object.assign({}, acc, { [parts[0]]: parts[1] });
+    }, {});
 
-      return {
-        [parts[0]]: parts[1],
-      };
-    });
+    const headerEntries = Object.entries(headersMap)
+      .map(entry => [String(entry[0]), String(entry[1])]);
+
+    const headers: Map<string, string> = new Map(headerEntries);
 
     return {
       start: {
