@@ -13,11 +13,13 @@
     "flow": "flow check"
   },
   "devDependencies": {
+    "babel-eslint": "^7.1.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-register": "^6.23.0",
     "eslint": "^3.17.0",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-config-prettier": "^1.4.1",
+    "eslint-plugin-flowtype": "^2.30.3",
     "eslint-plugin-import": "^2.2.0",
     "flow-bin": "^0.41.0",
     "lint-staged": "^3.3.1",
@@ -29,14 +31,20 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "airbnb-base"
+      "airbnb-base",
+      "plugin:flowtype/recommended"
     ],
     "env": {
       "node": true
     },
     "rules": {
-      "no-new": "off"
-    }
+      "no-new": "off",
+      "class-methods-use-this": "off"
+    },
+    "parser": "babel-eslint",
+    "plugins": [
+      "flowtype"
+    ]
   },
   "pre-commit": "lint-staged",
   "dependencies": {

@@ -4,6 +4,11 @@ import { Server } from 'net';
 
 import deferred from './utils/deferred';
 
+export type ServerParams = {
+  host?: string,
+  port: number
+};
+
 export default class TcpServer extends Server {
 
   constructor() {
@@ -23,9 +28,14 @@ export default class TcpServer extends Server {
     });
   }
 
-  listen(port) {
+  run(params: ServerParams) {
     const promise = deferred();
-    super.listen(port, () => promise.resolve());
+
+    super.listen({
+      host: params.host || '127.0.0.1',
+      port: params.port,
+    }, () => promise.resolve());
+
     return promise.promise;
   }
 }

@@ -1,6 +1,7 @@
 // @flow
 
 import TcpServer from './TcpServer';
+import type { ServerParams } from './TcpServer';
 import Connection from './Connection';
 
 export default class HttpServer extends TcpServer {
@@ -13,7 +14,7 @@ export default class HttpServer extends TcpServer {
     });
   }
 
-  listen(port) {
-    return super.listen(port);
+  run(params: ServerParams) {
+    return super.run(params);
   }
 }
