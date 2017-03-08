@@ -49,12 +49,11 @@ export default class Connection {
 
       const headersEndPosition: number = this.detectRequestHeaders(data);
       if (headersEndPosition !== -1) {
-        const headers: Headers = this.parseRequestHeaders(this.buffer.slice(0, headersEndPosition));
+        const rawHeaders = this.buffer.slice(0, headersEndPosition);
+        const headers: Headers = this.parseRequestHeaders(rawHeaders);
 
-        if (headers) {
-          this.request.setStartHeader(headers.start);
-          this.request.setHeaders(headers.common);
-        }
+        this.request.setStartHeader(headers.start);
+        this.request.setHeaders(headers.common);
 
         global.console.log(this.request.method);
         global.console.log(this.request.uri);
