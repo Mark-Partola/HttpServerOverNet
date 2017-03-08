@@ -1,17 +1,21 @@
 // @flow
 
 import { Socket } from 'net';
+import EventEmitter from 'events';
+
 import Request from './Request';
 import IncomingMessageParser from './IncomingMessageParser';
 
 import type { Headers } from './Request';
 
-export default class Connection {
+export default class Connection extends EventEmitter {
 
   request: Request;
   messageParser: IncomingMessageParser;
 
   constructor(client: Socket) {
+    super();
+
     this.request = new Request();
     this.messageParser = new IncomingMessageParser();
 
