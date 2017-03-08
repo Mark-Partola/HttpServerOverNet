@@ -48,6 +48,7 @@ export default class Connection {
       this.buffer = Buffer.concat([this.buffer, data]);
 
       const headersEndPosition: number = this.detectRequestHeaders(data);
+
       if (headersEndPosition !== -1) {
         const rawHeaders = this.buffer.slice(0, headersEndPosition);
         const headers: Headers = this.parseRequestHeaders(rawHeaders);
@@ -55,8 +56,7 @@ export default class Connection {
         this.request.setStartHeader(headers.start);
         this.request.setHeaders(headers.common);
 
-        global.console.log(this.request.method);
-        global.console.log(this.request.uri);
+        global.console.log(this.request.headers);
       }
     });
 
@@ -86,8 +86,10 @@ export default class Connection {
 
     const headers: Array<CommonHeader> = headerRows.map((row) => {
       const parts = row.split(': ');
-      return parts.reduce((acc, curr) =>
-        Object.assign({}, acc, { [curr[0]]: curr[1] }), {});
+
+      return {
+        [parts[0]]: parts[1],
+      };
     });
 
     return {
