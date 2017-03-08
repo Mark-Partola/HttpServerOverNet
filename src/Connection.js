@@ -22,9 +22,15 @@ export default class Connection extends EventEmitter {
     this.messageParser.on('headers', (headers: Headers) => {
       this.request.setStartHeader(headers.start);
       this.request.setHeaders(headers.common);
-    });
+      this.request.listen(client);
 
-    this.messageParser.on('body', (body: string) => this.request.setBody(body));
+      this.emit('request', this.request);
+
+      /**
+       * TODO: Научиться возвращать отрезанный кусок от тела запроса.
+       */
+      this.request.unshift(Buffer.from('Hello, world!!!'));
+    });
 
     client.on('data', (data: Buffer) => this.messageParser.process(data));
 

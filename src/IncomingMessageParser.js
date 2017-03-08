@@ -8,7 +8,6 @@ export default class IncomingMessageParser extends EventEmitter {
   bodyDelimiter: string;
   headerDelimiter: string;
   buffer: Buffer;
-  isBody: boolean;
   contentLength: number;
 
   constructor() {
@@ -35,13 +34,10 @@ export default class IncomingMessageParser extends EventEmitter {
 
       this.contentLength = Number(headers.common.get('Content-Length'));
 
-      this.buffer = this.buffer.slice(startBodyPosition);
-
-      this.isBody = true;
-    }
-
-    if (this.isBody && (this.contentLength === this.buffer.length)) {
-      this.emit('body', this.buffer.toString());
+      /**
+       * TODO: Остаток, откушенный от тела
+       */
+      this.buffer.slice(startBodyPosition);
     }
   }
 
