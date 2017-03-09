@@ -12,7 +12,7 @@ httpServer.on('request', (req, res) => {
     global.console.log(chunk.toString());
   });
 
-  res.write('Hello, Response');
+  res.setHeader('Content-Type', 'text/html');
 });
 
 httpServer.run({ port: 8081 }).then(() => {
