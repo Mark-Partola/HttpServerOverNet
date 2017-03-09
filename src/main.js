@@ -4,13 +4,15 @@ import HttpServer from './HttpServer';
 
 const httpServer = new HttpServer();
 
-httpServer.on('request', (req) => {
+httpServer.on('request', (req, res) => {
   global.console.log(req.headers);
 
   req.on('data', (chunk) => {
     global.console.log('chunk');
     global.console.log(chunk.toString());
   });
+
+  res.write('Hello, Response');
 });
 
 httpServer.run({ port: 8081 }).then(() => {

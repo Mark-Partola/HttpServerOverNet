@@ -4,6 +4,7 @@ import { Socket } from 'net';
 import EventEmitter from 'events';
 
 import Request from './Request';
+import Response from './Response';
 import IncomingMessageParser from './IncomingMessageParser';
 
 import type { Headers } from './Request';
@@ -11,20 +12,25 @@ import type { Headers } from './Request';
 export default class Connection extends EventEmitter {
 
   request: Request;
+  response: Response;
   messageParser: IncomingMessageParser;
 
   constructor(client: Socket) {
     super();
 
     this.request = new Request();
+    this.response = new Response();
+
+    this.request.connect(client);
+    this.response.connect(client);
+
     this.messageParser = new IncomingMessageParser();
 
     this.messageParser.on('headers', (headers: Headers) => {
       this.request.setStartHeader(headers.start);
       this.request.setHeaders(headers.common);
-      this.request.listen(client);
 
-      this.emit('request', this.request);
+      this.emit('request', this.request, this.response);
 
       /**
        * TODO: Научиться возвращать отрезанный кусок от тела запроса.

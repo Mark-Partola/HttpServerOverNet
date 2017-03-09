@@ -12,7 +12,7 @@ export default class HttpServer extends TcpServer {
 
     this.on('connection', (client: Socket) => {
       const connection = new Connection(client);
-      connection.on('request', request => this.emit('request', request));
+      connection.on('request', (...args) => this.emit('request', ...args));
     });
   }
 

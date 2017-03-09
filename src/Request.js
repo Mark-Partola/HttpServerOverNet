@@ -33,7 +33,7 @@ export default class Request extends Stream.Readable {
     this.headers = headers;
   }
 
-  listen(source: Socket) {
+  connect(source: Socket) {
     this.source = source;
   }
 
