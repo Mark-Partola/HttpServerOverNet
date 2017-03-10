@@ -3,10 +3,13 @@
 import Stream from 'stream';
 import { Socket } from 'net';
 
+type ResponseHeaders = Map<string, string>;
+
 class Response extends Stream.Writable {
 
   destination: Socket;
-  headers: {[key: string]: string};
+  headers: ResponseHeaders;
+  isHeadersSent: boolean;
 
   /**
    * TODO: научиться передавать опции. Ругается Flow, без понятия откуда взять тип.
@@ -14,7 +17,8 @@ class Response extends Stream.Writable {
   constructor() {
     super();
 
-    this.headers = {};
+    this.headers = new Map();
+    this.isHeadersSent = false;
   }
 
   connect(destination: Socket) {
@@ -22,13 +26,42 @@ class Response extends Stream.Writable {
   }
 
   setHeader(name: string, value: string): void {
-    this.headers[name] = value;
+    if (this.isHeadersSent) {
+      throw new Error('Headers already sent.');
+    }
+
+    this.headers.set(name, value);
   }
 
-  _write(): boolean {
+  end() {
+    this.destination.end();
+  }
+
+  _write(chunk: Buffer | string): boolean {
+    if (!this.isHeadersSent) {
+      this.destination.write('HTTP/1.1 200 OK\r\n');
+
+      this.destination.write(this.concatHeaders(this.headers));
+      this.destination.write('\r\n');
+      this.isHeadersSent = true;
+    }
+
+    /**
+     * TODO: Content-Length неизвестен
+     */
+    this.destination.write(chunk);
     return true;
   }
-}
 
+  concatHeaders(responseHeaders: ResponseHeaders) {
+    const entries = responseHeaders.entries();
+    let headers = '';
+    for (let header of entries) {
+      headers = `${header[0]}: ${header[1]}\r\n`;
+    }
+
+    return headers;
+  }
+}
 
 export default Response;

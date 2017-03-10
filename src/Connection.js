@@ -31,19 +31,15 @@ export default class Connection extends EventEmitter {
       this.request.setHeaders(headers.common);
 
       this.emit('request', this.request, this.response);
-
-      /**
-       * TODO: Научиться возвращать отрезанный кусок от тела запроса.
-       */
-      this.request.unshift(Buffer.from('Hello, world!!!'));
     });
 
-    client.on('data', (data: Buffer) => this.messageParser.process(data));
+    client.on('data', (data: Buffer) =>
+      this.messageParser.process(data));
 
-    client.on('close', (withError: boolean) => {
-      global.console.log(`Connection is closed${withError ? ' with error' : ''}.`);
-    });
+    client.on('close', (withError: boolean) =>
+      global.console.log(`Connection is closed${withError ? ' with error' : ''}.`));
 
-    client.on('error', error => global.console.log(error));
+    client.on('error', error =>
+      global.console.log(error));
   }
 }

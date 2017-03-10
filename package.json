@@ -39,7 +39,9 @@
     },
     "rules": {
       "no-new": "off",
-      "class-methods-use-this": "off"
+      "class-methods-use-this": "off",
+      "no-restricted-syntax": "off",
+      "prefer-const": "off"
     },
     "parser": "babel-eslint",
     "plugins": [
