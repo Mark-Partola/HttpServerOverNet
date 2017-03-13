@@ -25,12 +25,12 @@ class Response extends Stream.Writable {
     this.destination = destination;
   }
 
-  setHeader(name: string | number, value: string): void {
+  setHeader(name: string, value: string | number): void {
     if (this.isHeadersSent) {
       throw new Error('Headers already sent.');
     }
 
-    this.headers.set(name, value);
+    this.headers.set(name, String(value));
   }
 
   end(lastChunk?: Buffer | string | Function) {
