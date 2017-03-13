@@ -25,7 +25,7 @@ class Response extends Stream.Writable {
     this.destination = destination;
   }
 
-  setHeader(name: string, value: string): void {
+  setHeader(name: string | number, value: string): void {
     if (this.isHeadersSent) {
       throw new Error('Headers already sent.');
     }
