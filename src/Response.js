@@ -49,16 +49,15 @@ class Response extends Stream.Writable {
     /**
      * TODO: Content-Length неизвестен
      */
-    this.destination.write(chunk);
+    this.destination.write(chunk.toString());
     return true;
   }
 
   concatHeaders(responseHeaders: ResponseHeaders) {
-    const entries = responseHeaders.entries();
     let headers = '';
-    for (let header of entries) {
-      headers = `${header[0]}: ${header[1]}\r\n`;
-    }
+    responseHeaders.forEach((value, key) => {
+      headers += `${key}: ${value}\r\n`;
+    });
 
     return headers;
   }

@@ -13,11 +13,8 @@ httpServer.on('request', (req, res) => {
   });
 
   res.setHeader('Content-Type', 'text/plain');
-  // res.setHeader('Transfer-Encoding', 'chunked');
 
   res.write('Hello...');
-  res.write(' World\r\n');
-  res.write('New line!');
 
   res.end();
 });
