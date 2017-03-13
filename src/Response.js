@@ -33,11 +33,15 @@ class Response extends Stream.Writable {
     this.headers.set(name, value);
   }
 
-  end() {
+  end(lastChunk?: Buffer | string | Function) {
+    if (lastChunk) {
+      this.destination.write(lastChunk);
+    }
+
     this.destination.end();
   }
 
-  _write(chunk: Buffer | string): boolean {
+  _write(chunk: Buffer | string, encoding: string, cb: Function): boolean {
     if (!this.isHeadersSent) {
       this.destination.write('HTTP/1.1 200 OK\r\n');
 
@@ -46,10 +50,10 @@ class Response extends Stream.Writable {
       this.isHeadersSent = true;
     }
 
-    /**
-     * TODO: Content-Length неизвестен
-     */
-    this.destination.write(chunk.toString());
+    this.destination.write(chunk);
+
+    cb();
+
     return true;
   }
 
