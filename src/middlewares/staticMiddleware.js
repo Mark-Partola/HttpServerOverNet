@@ -16,10 +16,11 @@ export default function (req: Request, res: Response) {
     ext?: string;
     name?: string;
   } = {
-    base: (parsedPath.base.indexOf('.') === -1)
+    ...parsedPath,
+    base: (parsedPath.base === '')
       ? 'index.html'
       : parsedPath.base,
-    ...parsedPath,
+    ext: parsedPath.ext || '.html',
   };
 
   const requestedFile = path.normalize(path.format(normalizedPath));
