@@ -9,21 +9,11 @@ import Response from '../Response';
 export default function (req: Request, res: Response) {
   const parsedPath = path.parse(req.uri);
 
-  const normalizedPath: {
-    root?: string;
-    dir?: string;
-    base?: string;
-    ext?: string;
-    name?: string;
-  } = {
-    ...parsedPath,
-    base: (parsedPath.base === '')
-      ? 'index.html'
-      : parsedPath.base,
-    ext: parsedPath.ext || '.html',
-  };
+  const ext = parsedPath.ext || '.html';
+  const name = parsedPath.name || 'index';
+  const dir = parsedPath.dir;
 
-  const requestedFile = path.normalize(path.format(normalizedPath));
+  const requestedFile = path.normalize(`${dir}/${name}${ext}`);
 
   const file = path.resolve(`./src/public/${requestedFile}`);
 
@@ -32,6 +22,12 @@ export default function (req: Request, res: Response) {
       res.statusCode = 404;
       res.end('Not Found');
     } else {
+      fs.access(file, fs.constants.R_OK).then((err: Error) => {
+        if (err) {
+          res.statusCode = 401;
+          res.end('Permission Denied');
+        }
+      });
       fs.stat(file)
         .then((stats): Promise<number> => Promise.resolve(stats.size))
         .then((size: number) => {
