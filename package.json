@@ -40,7 +40,8 @@
     "rules": {
       "no-new": "off",
       "class-methods-use-this": "off",
-      "no-restricted-syntax": "off"
+      "no-restricted-syntax": "off",
+      "no-param-reassign": "off"
     },
     "parser": "babel-eslint",
     "plugins": [

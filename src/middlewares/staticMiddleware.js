@@ -26,12 +26,20 @@ export default function (req: Request, res: Response) {
   const requestedFile = path.normalize(path.format(normalizedPath));
 
   const file = path.resolve(`./src/public/${requestedFile}`);
-  fs.stat(file)
-    .then((stats): Promise<number> => Promise.resolve(stats.size))
-    .then((size: number) => {
-      res.setHeader('Content-Type', mime.lookup(requestedFile));
-      res.setHeader('Content-Length', size);
-      fs.createReadStream(file).pipe(res);
-    })
-    .catch(err => global.console.error(err));
+
+  fs.exists(file).then((exists: boolean) => {
+    if (!exists) {
+      res.statusCode = 404;
+      res.end('Not Found');
+    } else {
+      fs.stat(file)
+        .then((stats): Promise<number> => Promise.resolve(stats.size))
+        .then((size: number) => {
+          res.setHeader('Content-Type', mime.lookup(requestedFile));
+          res.setHeader('Content-Length', size);
+          fs.createReadStream(file).pipe(res);
+        })
+        .catch(err => global.console.error(err));
+    }
+  });
 }
