@@ -13,6 +13,8 @@ class Response extends Stream.Writable {
   responseStatusCode: number;
   statusDictionary: Map<number, string>;
 
+  currentContentLengthSent: number;
+
   /**
    * TODO: научиться передавать опции. Ругается Flow, без понятия откуда взять тип.
    */
@@ -21,6 +23,7 @@ class Response extends Stream.Writable {
 
     this.headers = new Map();
     this.isHeadersSent = false;
+    this.currentContentLengthSent = 0;
     this.responseStatusCode = 200;
     this.statusDictionary = new Map([
       [200, 'OK'],
@@ -28,7 +31,7 @@ class Response extends Stream.Writable {
     ]);
   }
 
-  connect(destination: Socket) {
+  bindSocket(destination: Socket) {
     this.destination = destination;
   }
 
@@ -46,18 +49,23 @@ class Response extends Stream.Writable {
 
   end(lastChunk?: Buffer | string | Function) {
     this.sendHeaderIfNeed();
-
-    if (lastChunk) {
-      this.destination.write(lastChunk);
-    }
-
-    this.destination.end();
+    this.destination.end(lastChunk);
   }
 
   _write(chunk: Buffer | string, encoding: string, cb: Function): boolean {
     this.sendHeaderIfNeed();
 
+    this.currentContentLengthSent += chunk.length;
     this.destination.write(chunk);
+
+    const contentLength = this.headers.get('Content-Length');
+    if (contentLength) {
+      if (this.currentContentLengthSent >= contentLength) {
+        cb();
+        this.emit('served');
+        return true;
+      }
+    }
 
     cb();
 
@@ -68,7 +76,8 @@ class Response extends Stream.Writable {
     if (!this.isHeadersSent) {
       this.destination.write(this.getStartHeader());
 
-      this.destination.write(this.concatHeaders(this.headers));
+      const headers = this.concatHeaders(this.headers);
+      this.destination.write(headers);
       this.destination.write('\r\n');
       this.isHeadersSent = true;
     }

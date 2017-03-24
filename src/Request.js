@@ -2,6 +2,7 @@
 
 import Stream from 'stream';
 import { Socket } from 'net';
+import IncomingMessageParser from './IncomingMessageParser';
 
 export type MainHeader = {
   method: string,
@@ -21,7 +22,15 @@ export default class Request extends Stream.Readable {
   version: string;
   headers: Map<string, string>;
 
+  messageParser: IncomingMessageParser;
+
   source: Socket;
+
+  constructor() {
+    super();
+
+    this.messageParser = new IncomingMessageParser();
+  }
 
   setStartHeader(startHeader: MainHeader): void {
     this.method = startHeader.method;
@@ -33,8 +42,18 @@ export default class Request extends Stream.Readable {
     this.headers = headers;
   }
 
-  connect(source: Socket) {
+  bindSocket(source: Socket) {
     this.source = source;
+
+    this.messageParser.on('headers', (headers: Headers) => {
+      this.setStartHeader(headers.start);
+      this.setHeaders(headers.common);
+
+      this.emit('headers');
+    });
+
+    this.source.on('data', (data: Buffer) =>
+      this.messageParser.process(data));
   }
 
   _read() {
